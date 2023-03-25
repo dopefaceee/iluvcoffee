@@ -1,4 +1,6 @@
+import { ParseIntPipe } from './../common/pipes/parse-int/parse-int.pipe';
 import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { Public } from 'src/common/decorators/public.decorator';
 import { CoffeesService } from './coffees.service';
 import { CreateCoffeeDto } from './dto/create-coffee.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
@@ -10,15 +12,18 @@ export class CoffeesController {
         private readonly coffeesService: CoffeesService
     ) { }
 
+    @Public()
     @Get()
-    findAll(@Query() paginationQuery: PaginationQueryDto) {
+    async findAll(@Query() paginationQuery: PaginationQueryDto) {
         // const {limit, offset} = paginationQuery;
+        // await new Promise(resolve => setTimeout(resolve, 5000))
         return this.coffeesService.findAll(paginationQuery);
     }
 
+    @Public()
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        const coffee = this.coffeesService.findOne(id);
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        const coffee = this.coffeesService.findOne('' + id);
         if (!coffee) {
             throw new NotFoundException(`Coffee #${id} not found`);
         }
